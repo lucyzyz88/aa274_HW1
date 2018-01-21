@@ -7,6 +7,12 @@ import matplotlib.pyplot as plt
 def q1_ode_fun(tau, z):
 
     # Code in the BVP ODEs
+    x_d = t_f *(-1) * (z[3]*np.cos(z[2,tau]) + z[4]*np.sin(z[2,tau]) )/2 * np.cos(z[2,tau])
+    y_d = t_f *(-1) * (z[3]*np.cos(z[2,tau]) + z[4]*np.sin(z[2,tau]) )/2 * np.sin(z[2,tau])
+    th_d = t_f * (-1) * z[5]/2
+    px_d = 0
+    py_d = 0
+    pth_d = (-1) * t_f * (z[3]*np.cos(z[2,tau]) + z[4]*np.sin(z[2,tau])) * (z[3]*np.sin(z[2,tau]) - z[4]*np.cos(z[2,tau]))/2
 
     return #...TODO...#
 
@@ -26,14 +32,24 @@ def q1_bc_fun(za, zb):
     x0 = [0, 0, -np.pi/2.0]
 
     # Code boundary condition residuals
+    
+    return (np.array([za[0] - x0[0]]),
+    		np.array([za[1] - x0[1]]),
+    		np.array([za[2] - x0[2]]),
+    		np.array([zb[0] - xf[0]]),
+    		np.array([zb[1] - xf[1]]),
+    		np.array([zb[2] - xf[2]]),
+            )  #...TODO...#
 
-    return #...TODO...#
+#Define solver state: z = [x, y, th, px, py, pth, r]
+problem = scikits.bvp_solver.ProblemDefinition(num_ODE = 6,
+                                      num_parameters = 0,
+                                      num_left_boundary_conditions = 3,
+                                      boundary_points = (0, 1),
+                                      function = q1_ode_fun,
+                                      boundary_conditions = q1_bc_fun)
 
-#Define solver state: z = [x, y, th, ...? ]
-problem = scikits.bvp_solver.ProblemDefinition(#...TODO...#
-                                               )
-
-soln = scikits.bvp_solver.solve(problem, solution_guess = (#...TODO...#
+soln = scikits.bvp_solver.solve(problem, solution_guess = (1,1,1,1,1,1,1
                                 ))
 
 dt = 0.005
@@ -53,9 +69,9 @@ if flip:
     z[3:7,:] = -z[3:7,:]
 z = z.T # solution arranged column-wise
 
-# Recover optimal control histories
-V = #...TODO...#
-om = #...TODO...#
+# Recover optimal control histories TO...DO...
+V = np.gradient(z_0,dt)/np.cos(z_2)
+om = np.gradient(z_2,dt)
 
 V = np.array([V]).T # Convert to 1D column matrices
 om = np.array([om]).T
