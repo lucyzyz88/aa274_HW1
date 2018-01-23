@@ -1,5 +1,5 @@
 import numpy as np
-from numpy import linalg
+from numpy import linalgt
 from P3_pose_stabilization import ctrl_pose
 
 def ctrl_traj(x,y,th,ctrl_prev,x_d,y_d,xd_d,yd_d,xdd_d,ydd_d,x_g,y_g,th_g):
@@ -14,10 +14,10 @@ def ctrl_traj(x,y,th,ctrl_prev,x_d,y_d,xd_d,yd_d,xdd_d,ydd_d,x_g,y_g,th_g):
     dt = 0.005
 
     # Gains
-    kpx = #...TODO...#
-    kpy =
-    kdx =
-    kdy =
+    kpx = 0.5 #...TODO...#
+    kpy = 0.5
+    kdx = 1
+    kdy = 1
 
     # Define control inputs (V,om) - without saturation constraints
     # Switch to pose controller once "close" enough, i.e., when
@@ -25,8 +25,7 @@ def ctrl_traj(x,y,th,ctrl_prev,x_d,y_d,xd_d,yd_d,xdd_d,ydd_d,x_g,y_g,th_g):
     #...TODO...#
     # If close enough
     if (((x-x_d)<=0.35) | ((y-y_d)<=0.35)):
-        V = ctrl_pose[0]
-        om = ctrl_pose[1]
+        [V,om] = ctrl_pose(x,y,th,x_g,y_g,th_g)
     else:
         #Virtual Control Law
         u1 = xdd_d + kpx*(x_d - x) + kdx*(xd_d - ctrl_prev[0]*np.cos(th))

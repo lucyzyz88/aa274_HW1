@@ -40,7 +40,7 @@ N = int(t_f/dt)
 t = dt*np.array(range(N+1)) # t[0],....,t[N]
 t = t.T
 data = np.zeros((N+1,9))
-
+print(X_coeff[0])
 # Compute trajectory, store in data, format: [x,y,th,V,om,xd,yd,xdd,ydd]
 #...TODO...#
 #x stored in data#
@@ -65,7 +65,7 @@ for j in range(np.size(th)):
 	if (xd[j] == 0):
 		th[j] = -np.pi/2
 	else:
-		th[j] = np.arctan(yd[j]/xd[j])
+		th[j] = np.arctan2(yd[j],xd[j])
 data[:,2] = th
 print(th)
 #print(th)
@@ -95,11 +95,19 @@ s = cumtrapz(ds,t,initial = 0)
 # the original value V, and values required to ensure both constraints are satisfied)
 # V_tilde = ...TODO...#
 V_tilde = np.zeros(N+1)
+V_tildeom = np.zeros(N+1)
 for i in range(np.size(V_tilde)):
-	if V[i] > 0.5:
-		V_tilde[i] = 0.5
+	if om[i] != 0:
+		V_tildeom[i] = V[i]/abs(om[i])
 	else:
-		V_tilde[i] = V[i]
+		V_tildeom[i] = math.inf
+	V_tilde[i] = min(0.5, V[i], V_tildeom[i])
+
+# for i in range(np.size(V_tilde)):
+# 	if V[i] > 0.5:
+# 		V_tilde[i] = 0.5
+# 	else:
+# 		V_tilde[i] = V[i]
 
 # Compute tau (HINT: use the function cumtrapz)
 # tau = ...TODO...#
@@ -111,11 +119,12 @@ tau = cumtrapz(dtau,s,initial = 0)
 om_tilde = np.zeros(N+1)
 om_tilde = om * V_tilde / V
 
-for i in range(np.size(om_tilde)):
-	if om_tilde[i] > 1:
-		om_tilde[i] = 1
-	elif om_tilde[i] < -1:
-		om_tilde[i] = -1
+
+# for i in range(np.size(om_tilde)):
+# 	if om_tilde[i] > 1:
+# 		om_tilde[i] = 1
+# 	elif om_tilde[i] < -1:
+# 		om_tilde[i] = -1
 
 # Get new final time
 tf_new = tau[-1]

@@ -5,22 +5,24 @@ import matplotlib.pyplot as plt
 
 
 def q1_ode_fun(tau, z):
-
+	# z = [x, y, th, px, py, pth, r]
     # Code in the BVP ODEs
-    x_d = t_f *(-1) * (z[3]*np.cos(z[2,tau]) + z[4]*np.sin(z[2,tau]) )/2 * np.cos(z[2,tau])
-    y_d = t_f *(-1) * (z[3]*np.cos(z[2,tau]) + z[4]*np.sin(z[2,tau]) )/2 * np.sin(z[2,tau])
-    th_d = t_f * (-1) * z[5]/2
+    x_d = z[6] *(-1) * (z[3]*np.cos(z[2]) + z[4]*np.sin(z[2]) )/2 * np.cos(z[2])
+    y_d = z[6] *(-1) * (z[3]*np.cos(z[2]) + z[4]*np.sin(z[2]) )/2 * np.sin(z[2])
+    th_d = z[6] * (-1) * z[5]/2
     px_d = 0
     py_d = 0
-    pth_d = (-1) * t_f * (z[3]*np.cos(z[2,tau]) + z[4]*np.sin(z[2,tau])) * (z[3]*np.sin(z[2,tau]) - z[4]*np.cos(z[2,tau]))/2
-
-    return #...TODO...#
-
+    pth_d = (-1) * z[6] * (z[3]*np.cos(z[2]) + z[4]*np.sin(z[2])) * (z[3]*np.sin(z[2]) - z[4]*np.cos(z[2]))/2
+    #Seven Variables, Seven Equations, the last one is r' = 0 because tf is a constant. tau is not an unknown variable
+    #everything is dependent on tau.
+    r_d = 0
+    return np.array([x_d,y_d,th_d,px_d,py_d,pth_d,r_d])
 
 def q1_bc_fun(za, zb):
-
+	# za = z at time 0
+	# 
     # lambda
-    lambda_test = 1.0
+    lambda_test = 0.09
 
     # goal pose
     x_g = 5
@@ -30,32 +32,32 @@ def q1_bc_fun(za, zb):
 
     # initial pose
     x0 = [0, 0, -np.pi/2.0]
+    # start conditions on the left has three equations
+    bc_start = np.array([za[0]-x0[0], za[1]-x0[1], za[2]-x0[2]])
+    # end conditions on the right has four equations
+    bc_end = np.array([zb[0]-xf[0], zb[1]-xf[1], zb[2]-xf[2], lambda_test-(zb[4]**2)/4-(zb[5]**2)/4])
+    return bc_start, bc_end
 
     # Code boundary condition residuals
     
-    return (np.array([za[0] - x0[0]]),
-    		np.array([za[1] - x0[1]]),
-    		np.array([za[2] - x0[2]]),
-    		np.array([zb[0] - xf[0]]),
-    		np.array([zb[1] - xf[1]]),
-    		np.array([zb[2] - xf[2]]),
-            )  #...TODO...#
-
 #Define solver state: z = [x, y, th, px, py, pth, r]
-problem = scikits.bvp_solver.ProblemDefinition(num_ODE = 6,
+#Side Note: The sizes of these arrays must add up to the total number of ODEs plus the number of unknown parameters.
+
+problem = scikits.bvp_solver.ProblemDefinition(num_ODE = 7,
                                       num_parameters = 0,
                                       num_left_boundary_conditions = 3,
                                       boundary_points = (0, 1),
                                       function = q1_ode_fun,
                                       boundary_conditions = q1_bc_fun)
 
-soln = scikits.bvp_solver.solve(problem, solution_guess = (1,1,1,1,1,1,1
+soln = scikits.bvp_solver.solve(problem, solution_guess = (3,3, -np.pi/2,-2,-2,5,20
                                 ))
 
 dt = 0.005
 
 # Test if time is reversed in bvp_solver solution
 z_0 = soln(0)
+
 flip = 0
 if z_0[-1] < 0:
     t_f = -z_0[-1]
@@ -69,9 +71,11 @@ if flip:
     z[3:7,:] = -z[3:7,:]
 z = z.T # solution arranged column-wise
 
+
 # Recover optimal control histories TO...DO...
-V = np.gradient(z_0,dt)/np.cos(z_2)
-om = np.gradient(z_2,dt)
+# Weird multiplication
+V = (-1/2) * (z[:,3] * np.cos(z[:,2]) +z[:,4] * np.sin(z[:,2]))
+om =(-1/2) * z[:,5]
 
 V = np.array([V]).T # Convert to 1D column matrices
 om = np.array([om]).T
