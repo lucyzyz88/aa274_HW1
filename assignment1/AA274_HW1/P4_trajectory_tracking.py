@@ -1,5 +1,5 @@
 import numpy as np
-from numpy import linalgt
+from numpy import linalg
 from P3_pose_stabilization import ctrl_pose
 
 def ctrl_traj(x,y,th,ctrl_prev,x_d,y_d,xd_d,yd_d,xdd_d,ydd_d,x_g,y_g,th_g):
@@ -14,8 +14,8 @@ def ctrl_traj(x,y,th,ctrl_prev,x_d,y_d,xd_d,yd_d,xdd_d,ydd_d,x_g,y_g,th_g):
     dt = 0.005
 
     # Gains
-    kpx = 0.5 #...TODO...#
-    kpy = 0.5
+    kpx = 1.5 #...TODO...#
+    kpy = 1
     kdx = 1
     kdy = 1
 
@@ -24,7 +24,7 @@ def ctrl_traj(x,y,th,ctrl_prev,x_d,y_d,xd_d,yd_d,xdd_d,ydd_d,x_g,y_g,th_g):
     # the robot is within 0.5m of the goal xy position.
     #...TODO...#
     # If close enough
-    if (((x-x_d)<=0.35) | ((y-y_d)<=0.35)):
+    if (((x-x_g)**2 + (y-y_g)**2)**0.5) <= 0.5:
         [V,om] = ctrl_pose(x,y,th,x_g,y_g,th_g)
     else:
         #Virtual Control Law

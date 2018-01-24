@@ -22,7 +22,7 @@ def q1_bc_fun(za, zb):
 	# za = z at time 0
 	# 
     # lambda
-    lambda_test = 0.09
+    lambda_test = 1
 
     # goal pose
     x_g = 5
@@ -50,7 +50,7 @@ problem = scikits.bvp_solver.ProblemDefinition(num_ODE = 7,
                                       function = q1_ode_fun,
                                       boundary_conditions = q1_bc_fun)
 
-soln = scikits.bvp_solver.solve(problem, solution_guess = (3,3, -np.pi/2,-2,-2,5,20
+soln = scikits.bvp_solver.solve(problem, solution_guess = (1,1, -np.pi/2,-1,-1,5,10
                                 ))
 
 dt = 0.005
@@ -74,8 +74,8 @@ z = z.T # solution arranged column-wise
 
 # Recover optimal control histories TO...DO...
 # Weird multiplication
-V = (-1/2) * (z[:,3] * np.cos(z[:,2]) +z[:,4] * np.sin(z[:,2]))
-om =(-1/2) * z[:,5]
+V = (-1./2) * (z[:,3] * np.cos(z[:,2]) +z[:,4] * np.sin(z[:,2]))
+om =(-1./2) * z[:,5]
 
 V = np.array([V]).T # Convert to 1D column matrices
 om = np.array([om]).T

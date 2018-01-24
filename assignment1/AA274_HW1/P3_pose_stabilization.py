@@ -7,24 +7,21 @@ def ctrl_pose(x,y,th,x_g,y_g,th_g):
 
     #Code pose controller
     #...TODO...#
-    x_g = 5
-    y_g = 5
-    th_g = -(np.pi)/2
 
     #Define control inputs (V,om) - without saturation constraints
     #Define Control constants k1,k2,k3
-    k1 = 1.5
+    k1 = 0.8
     k2 = 0.8
     k3 = 0.2
     
-    alpha = wrapToPi(np.arctan((y_g - y)/(x_g - x)) - th)
+    alpha = wrapToPi(np.arctan2((y_g - y),(x_g - x)) - th)
     ro = ((y_g - y)**2 + (x_g - x)**2)**0.5
-    delta = wrapToPi(np.arctan((y_g - y)/(x_g - x)) - th_g)
+    delta = wrapToPi(np.arctan2((y_g - y),(x_g - x)) - th_g)
 
 
 
     V = k1 * ro * np.cos(alpha)
-    om = k2 * alpha + k1 * np.sinc(alpha) * np.cos(alpha) *(alpha + k3*delta)
+    om = k2 * alpha + k1 * np.sinc(alpha/np.pi) * np.cos(alpha) *(alpha + k3*delta)
 
     # Apply saturation limits
     V = np.sign(V)*min(0.5, np.abs(V))
